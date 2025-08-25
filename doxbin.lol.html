@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dox.report — style homage (clean)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fg:#e7e7e7; 
+      --muted:#9aa3ab; 
+      --accent:#ff2d55;
+      --mono:'VT323', monospace; 
+      --sans:'Inter', sans-serif;
+    }
+
+    * { box-sizing:border-box; margin:0; padding:0 }
+    html,body { height:100% }
+    body {
+      color:var(--fg);
+      font-family:var(--sans);
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    /* Background containers */
+    #bgVideo, #bgImage, #bgBlack {
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:-2;
+      display:none;
+    }
+
+    #bgVideo {
+      filter:brightness(0.25) saturate(0.85);
+    }
+
+    #bgImage {
+      background:url("https://files.catbox.moe/z37ghe.png") no-repeat center center;
+      background-size:cover;
+    }
+
+    #bgBlack {
+      background:black;
+    }
+
+    .wrap {
+      min-height:100dvh;
+      display:grid;
+      place-items:center;
+      padding:4rem 1rem;
+      position:relative;
+      z-index:1;
+    }
+
+    .container {
+      width:min(1100px,100%);
+      text-align:center;
+    }
+
+    .title {
+      font-family:var(--mono);
+      font-size:clamp(2.2rem,6vw,4rem);
+      letter-spacing:.03em;
+      margin-bottom:2.5rem;
+    }
+
+    .profiles {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:4rem;
+      margin-top:2rem;
+    }
+
+    .profile { text-align:center }
+
+    .avatar {
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      object-fit:cover;
+      border:2px solid rgba(255,255,255,0.2);
+      box-shadow:0 0 0 3px rgba(0,0,0,.35),0 10px 18px rgba(0,0,0,.4);
+      margin-bottom:.75rem;
+    }
+
+    .name {
+      font-weight:700;
+      font-size:1.2rem;
+      letter-spacing:.02em;
+    }
+
+    .dot {
+      display:inline-block;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--accent);
+      margin-right:.5rem;
+      box-shadow:0 0 12px var(--accent);
+    }
+
+    .role {
+      margin-top:.25rem;
+      color:var(--muted);
+      font-size:.95rem;
+      max-width:200px; 
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* Hide audio completely */
+    audio {
+      display: none;
+    }
+
+    .music-controls, .background-controls {
+      margin-top:3rem;
+      font-family:var(--mono);
+      font-size:1rem;
+    }
+
+    select {
+      background:rgba(0,0,0,0.5);
+      color:var(--fg);
+      border:none;
+      padding:.4rem;
+      border-radius:4px;
+      font-family:var(--mono);
+      font-size:1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background options -->
+  <video id="bgVideo" autoplay muted loop playsinline>
+    <source src="https://files.catbox.moe/gij1b1.mp4" type="video/mp4">
+  </video>
+  <div id="bgImage"></div>
+  <div id="bgBlack"></div>
+
+  <main class="wrap">
+    <div class="container">
+      <h1 class="title">- Dox.report -</h1>
+      <div class="profiles">
+        <div class="profile">
+          <img class="avatar" src="https://files.catbox.moe/ixj070.jpg" alt="GF avatar" />
+          <div class="name"><span class="dot"></span>GF</div>
+          <div class="role">Owner @related @doxbin</div>
+        </div>
+        <div class="profile">
+          <img class="avatar" src="https://files.catbox.moe/g04vlg.png" alt="Second avatar" />
+          <div class="name"><span class="dot"></span>nachash</div>
+          <div class="role">owner @doxbin </div>
+        </div>
+      </div>
+
+      <div class="music-controls">
+        <label for="songSelect">Choose a song:</label>
+        <select id="songSelect" onchange="changeSong()">
+          <option value="https://files.catbox.moe/l92lp3.m4a">Song 1</option>
+          <option value="">Song 2 (add later)</option>
+        </select>
+        <!-- Hidden audio player -->
+        <audio id="audioPlayer" autoplay loop>
+          <source src="https://files.catbox.moe/l92lp3.m4a" type="audio/mp4">
+        </audio>
+      </div>
+
+      <div class="background-controls">
+        <label for="bgSelect">Background:</label>
+        <select id="bgSelect" onchange="changeBackground()">
+          <option value="video">Video</option>
+          <option value="image">Image</option>
+          <option value="black">Black</option>
+        </select>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const player = document.getElementById('audioPlayer');
+    const bgVideo = document.getElementById('bgVideo');
+    const bgImage = document.getElementById('bgImage');
+    const bgBlack = document.getElementById('bgBlack');
+
+    // Default: show video
+    bgVideo.style.display = "block";
+
+    // Autoplay workaround
+    window.addEventListener('load', () => {
+      player.play().catch(() => {
+        console.log("Autoplay blocked by browser. User interaction required.");
+      });
+    });
+
+    function changeSong(){
+      const select = document.getElementById('songSelect');
+      player.src = select.value;
+      player.play();
+    }
+
+    function changeBackground(){
+      const select = document.getElementById('bgSelect');
+      bgVideo.style.display = "none";
+      bgImage.style.display = "none";
+      bgBlack.style.display = "none";
+
+      if(select.value === "video"){
+        bgVideo.style.display = "block";
+      } else if(select.value === "image"){
+        bgImage.style.display = "block";
+      } else if(select.value === "black"){
+        bgBlack.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>
